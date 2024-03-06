@@ -7,7 +7,7 @@ Creating a digital twin of an SDN network by using mininet, RYU and REST APIs.
 ## CLONE THE REPOSITORY
 ```bash
   cd comnetsemu
-  git clone https://github.com/Fundamentals-of-robotics/ur5.git
+  git clone https://github.com/piegian99ita/SDN_digital_twin
 ```
 
 ## HOW TO USE
