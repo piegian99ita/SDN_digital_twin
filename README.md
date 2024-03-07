@@ -25,7 +25,7 @@ In the first terminal window start the topology:
 In order to start the RYU controller type in the second window:
 
 ```bash
-  ryu-manager ryu.app.simple_switch_13 rest_topology
+  ryu-manager ryu.app.simple_switch_13 ryu.app.rest_topology
 ```
 
 ### START THE MONITOR
