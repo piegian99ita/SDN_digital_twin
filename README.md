@@ -12,23 +12,30 @@ Creating a digital twin of an SDN network by using mininet, RYU and REST APIs.
 
 ## HOW TO USE
 
+### START THE NETWORK
+
 Start the VM with multipass or vagrant. Open 3 terminal windows.
 In the first terminal window start the topology:
 ```bash
   cd comnetsemu/SDN_digital_twin
   sudo python3 topology.py
 ```
+### START THE CONTROLLER
+
 In order to start the RYU controller type in the second window:
 
 ```bash
-  cd comnetsemu/SDN_digital_twin
-  ryu-manager controller.py
+  ryu-manager ryu.app.simple_switch_13 rest_topology
 ```
 
-(This script doesn't work because we have to change the controller in order to receive an http request by using the RYU REST APIs: it doen't receive an HTTP response and it remains "blocked")
-In order to start the monitor we can type in the third window:
+### START THE MONITOR
+
+(There's a problem with the third host:it's not detected idk why)
+In order to start the monitor we can type in the third window: 
 
 ```bash
   cd comnetsemu/SDN_digital_twin
   python3 monitor.py
 ```
+
+(This will retrieve the information about the topology every 10 seconds and print in the terminal the informations retrieved)

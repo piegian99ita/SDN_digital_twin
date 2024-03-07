@@ -5,7 +5,7 @@ import time
 
 
 # Definizione degli endpoint dell'API REST
-BASE_URL = 'http://127.0.0.1:6633/v1.0/topology'
+BASE_URL = 'http://127.0.0.1:8080/v1.0/topology'
 SWITCHES_ENDPOINT = '/switches'
 LINKS_ENDPOINT = '/links'
 HOSTS_ENDPOINT = '/hosts'
@@ -36,26 +36,27 @@ def get_hosts():
 
 # Esempio di utilizzo delle funzioni per ottenere le informazioni sulla topologia
 if __name__ == "__main__":
-    print("START MONITORING!")
-    switches = get_switches()
-    if switches:
-        print("Switches:")
-        for switch in switches:
-            print(switch)
-    
-    links = get_links()
-    if links:
-        print("\nLinks:")
-        for link in links:
-            print(link)
-    
-    hosts = get_hosts()
-    if hosts:
-        print("\nHosts:")
-        for host in hosts:
-            print(host)
-    
     while True:
-        print("sto continuando a processare")
+        print("START MONITORING!")
+        switches = get_switches()
+        if switches:
+            print("Switches:")
+            for switch in switches:
+                print(switch)
+                
+        
+        
+        links = get_links()
+        if links:
+            print("\nLinks:")
+            for link in links:
+                print(link)
+        
+        hosts = get_hosts()
+        if hosts:
+            print("\nHosts:")
+            for host in hosts:
+                print(host)
         time.sleep(10)
+
 
