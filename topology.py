@@ -15,10 +15,10 @@ class NetworkTopo(Topo):
         # Create template host, switch, and link
         host_config = dict(inNamespace=True)
         
-        link_config = dict(bw=10)
-        host_link_config = dict(bw=1)
+        link_config = dict(bw=1)
+        
 
-        for i in range(1):
+        for i in range(4):
             sconfig = {"dpid": "%016x" % (i + 1)}
             self.addSwitch("s%d" % (i + 1), **sconfig)
 
@@ -27,11 +27,16 @@ class NetworkTopo(Topo):
             self.addHost("h%d" % (i + 1), **host_config)
 
         
+        # Add switch links
+        self.addLink("s1", "s2", **link_config)
+        self.addLink("s2", "s4", **link_config)
+        self.addLink("s2", "s3", **link_config)
 
         # Add host links
-        self.addLink("h1", "s1", **host_link_config)
-        self.addLink("h2", "s1", **host_link_config)
-        self.addLink("h3", "s1", **host_link_config)
+        self.addLink("h1", "s1", **link_config)
+        self.addLink("h2", "s3", **link_config)
+        self.addLink("h3", "s4", **link_config)
+        #self.addLink("h4", "s4", **link_config)
 
         # # Create switch nodes
         # for i in range(4):
@@ -42,11 +47,8 @@ class NetworkTopo(Topo):
         # for i in range(6):
         #     self.addHost("h%d" % (i + 1), **host_config)
 
-        # # Add switch links
-        # self.addLink("s1", "s2", **link_config)
-        # self.addLink("s2", "s4", **link_config)
-        # self.addLink("s1", "s3", **link_config)
-        # self.addLink("s3", "s4", **link_config)
+        
+        
 
         # # Add host links
         # self.addLink("h1", "s1", **host_link_config)

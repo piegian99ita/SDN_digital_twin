@@ -57,6 +57,6 @@ if __name__ == "__main__":
             print("\nHosts:")
             for host in hosts:
                 print(host)
-        time.sleep(10)
+        time.sleep(20)
 
 
