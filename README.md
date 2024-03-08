@@ -25,7 +25,8 @@ In the first terminal window start the topology:
 In order to start the RYU controller type in the second window:
 
 ```bash
-  ryu-manager ryu.app.simple_switch_13 ryu.app.rest_topology
+  cd comnetsemu/SDN_digital_twin
+  ryu-manager controller.py
 ```
 
 ### START THE MONITOR
