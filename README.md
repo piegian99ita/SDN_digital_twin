@@ -26,7 +26,7 @@ In order to start the RYU controller type in the second window:
 
 ```bash
   cd comnetsemu/SDN_digital_twin
-  ryu-manager controller.py
+  ryu-manager --observe-links controller.py
 ```
 
 ### START THE MONITOR
