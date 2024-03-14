@@ -276,10 +276,10 @@ if __name__ == "__main__":
                 net2.addLink(link['first']+"_twin", link['second']+"_twin")
 
             
-            print("build")
+            p
             net2.configHosts()
             
-            print("post build")
+          
 
 
         old_links=new_links
