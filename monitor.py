@@ -288,8 +288,7 @@ if __name__ == "__main__":
         i+=1
         
         net2.controllers[0].stop()
-        net2.stop()
-        net2.start()
+        
         net2.controllers[0].start()
         CLI(net2)
         # net2.stop()
