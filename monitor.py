@@ -5,7 +5,10 @@ from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 from mininet.link import TCLink
 from mininet.cli import CLI
-
+import os
+import time
+import threading
+import subprocess
 
 #questo script serve per definire la topologia della rete ricevendo dal controller queste informazioni 
 
@@ -68,6 +71,51 @@ class NetworkTopo(Topo):
 
 topos = {"digital_twin_topo": (lambda: NetworkTopo())}
 
+
+
+
+
+def host_write(host):
+    while not host.shell or host.waiting:
+        time.sleep(1)
+    
+    
+    index=0
+    while True:
+        file_name="capture_"+str(host)+"_"+str(index)+".pcap"
+        
+        print("Entered before")
+        
+        while (not os.path.exists(file_name)):
+            time.sleep(2)
+            
+        print("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
+        
+        file_name_to_remove="capture_"+str(host)+"_"+str(index)+".pcap"
+        subprocess.run(['rm', '-f', file_name_to_remove])
+        
+        index=index+1
+        #host.cmd("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
+
+
+
+
+def network_write(net):
+      
+    file_path="parti.txt"
+    with open(file_path, 'w'):
+        pass
+    
+    
+    hosts=net.hosts
+    for host in hosts:
+        thread=threading.Thread(target=host_write, args=(host,))
+        thread.start()
+        print(host)
+
+
+
+
 def create_network(hosts,switches,links):
     print("\nCreate new network")
     digital_topo = NetworkTopo(hosts,switches,links)
@@ -84,6 +132,8 @@ def create_network(hosts,switches,links):
     net2.addController(controller)
     net2.build()
     net2.start()
+    thread=threading.Thread(target=network_write, args=(net2,))
+    thread.start()
     CLI(net2)
     net2.stop()
 
