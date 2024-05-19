@@ -87,9 +87,9 @@ def host_read(host):
     index=0
     
     while True:
-        file_name="capture_"+str(host)+"_"+str(index)+".pcap"
+        file_name="./capture/capture_"+str(host)+"_"+str(index)+".pcap"
         
-        send_cmd="timeout 20 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name
+        send_cmd="timeout 10 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name
         host.cmd(send_cmd)
         
         index=index+1
@@ -97,19 +97,26 @@ def host_read(host):
 
 def network_read_write(net):
     hosts=net.hosts
+    file_path="start.txt"
+    subprocess.run(['rm', '-f', file_path])
 
-    file_path="parti.txt"
+
+    
     print("Wait")
     while (not os.path.exists(file_path)):
         time.sleep(2)
         
     print("Finished waiting")
-        
+    thread_list=[] 
+    i=0   
     for host in hosts:
-        thread=threading.Thread(target=host_read, args=(host,))
-        thread.start()
+        thread_list.append(threading.Thread(target=host_read, args=(host,)))
+        thread_list[i].start()
+        i+=1
         print(host)
-        
+    
+    for threads in thread_list:
+        threads.join() 
         
         
         
@@ -140,6 +147,8 @@ if __name__ == "__main__":
     
     thread=threading.Thread(target=network_read_write, args=(net,))
     thread.start()
+
     CLI(net)
+    thread.join()
     net.stop()
     
