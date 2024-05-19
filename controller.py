@@ -7,7 +7,6 @@ from ryu.app.wsgi import WSGIApplication
 from ryu.base import app_manager
 from ryu.lib import dpid as dpid_lib
 from ryu.topology.api import get_switch, get_link, get_host
-from ryu.lib.packet import arp
 
 
 from ryu.controller import ofp_event
@@ -30,10 +29,7 @@ class TopologyAPI(app_manager.RyuApp):
 
         wsgi = kwargs['wsgi']
         wsgi.register(TopologyController, {'topology_api_app': self})
-    
-    # Gestione dell'evento generato quando un nuovo switch entra nella rete
-   
-            
+
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
         datapath = ev.msg.datapath
@@ -92,9 +88,6 @@ class TopologyAPI(app_manager.RyuApp):
 
         self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
 
-
-        
-
         # learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port
         if dst in self.mac_to_port[dpid]:
@@ -121,11 +114,9 @@ class TopologyAPI(app_manager.RyuApp):
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
                                   in_port=in_port, actions=actions, data=data)
         datapath.send_msg(out)
-        
 
 
 
-    
 
 
 class TopologyController(ControllerBase):

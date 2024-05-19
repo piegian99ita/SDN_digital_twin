@@ -29,27 +29,14 @@ def discover_hosts():
 
     return host_ips
 
-def generate_traffic(server_ip, client_ip):
-    # Start iPerf in server mode on the server host
-    server_command = ['iperf', '-s']
-    server_process = subprocess.Popen(server_command)
-
-    # Start iPerf in client mode on the client host
-    client_command = ['iperf', '-c', server_ip]
-    client_process = subprocess.Popen(client_command)
-
-    # Wait for the client process to complete
-    client_process.wait()
-
-    # Terminate the server process
-    server_process.terminate()
+def generate_traffic(client_ip):
+    # Start ping command to generate traffic from this host to the client
+    ping_command = ['ping', '-c', '10', client_ip]  # Sends 10 ping packets
+    subprocess.run(ping_command)
 
 if __name__ == "__main__":
     # Get the local IP address
     local_ip = get_local_ip()
-
-    # Use the local IP address as the server IP
-    server_ip = local_ip
 
     # Discover active hosts within the network
     host_ips = discover_hosts()
@@ -59,8 +46,11 @@ if __name__ == "__main__":
         print("No hosts found in the network.")
         sys.exit(1)
 
-    # Choose the first discovered host as the client
-    client_ip = host_ips[0]
-
-    # Generate traffic between the server and client
-    generate_traffic(server_ip, client_ip)
+    # Iterate through each discovered host and generate traffic
+    while True:
+    	for client_ip in host_ips:
+        	# Skip if client_ip is the same as local_ip
+        	if client_ip == local_ip:
+            		continue
+        	# Generate traffic from this host to the client
+        	generate_traffic(client_ip)
