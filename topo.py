@@ -6,6 +6,9 @@ from mininet.node import OVSKernelSwitch, RemoteController
 from mininet.cli import CLI
 from mininet.link import TCLink
 from mininet.util import dumpNodeConnections
+import os
+import time
+import threading
 
 
 class NetworkTopo(Topo):
@@ -69,92 +72,6 @@ topos = {"networkslicingtopo": (lambda: NetworkTopo())}
 
 
 
-import subprocess as sub
-import time
-import threading
-
-mutex=threading.Lock()
-
-def thread_function():
-    while True:
-        if mutex.locked() is True:
-            mutex.release()
-        print("Call the tcpdump")
-        # I use tcpdump listener for my system
-        command = ["sudo", "tcpdump", "-l","-i", "any", "not", "host", "127.0.0.1","and" ,"not","host","127.0.0.53","and", "not", "port", "22", "and", "not", "ether", "proto", "0x88cc", "and", "not", "icmp6", "-w","capture.pcap"]
-    
-        process = sub.Popen(command,
-                            stdout=sub.DEVNULL,
-                            stderr=sub.STDOUT)
-        #Every 10s I save all the packets read and repeat the previous actions
-        print("Asked for second mutex")
-        mutex.acquire()
-        print("Entered second mutex")
-        time.sleep(10)
-        #I will continually look for data until we don't finish to elaborate them.
-        print("kill process")
-        process.kill()
-
-from scapy.all import *
-def scapy_test(net):
-    
-    h1 = net.get('h1')  # Get host h1
-    print("Called python")
-    h1.cmd('python test_py.py')
-    return
-
-    packets = rdpcap("second_capture.pcap")
-    if not packets:
-        #Empty file
-        return
-    for packet in packets:
-        if IP in packet and packet.haslayer(IP):
-            print(packet[IP].src)
-            print(packet[IP].dst)
-            #print(packet[Ether].src)
-            p = IP(dst="10.0.0.1")/TCP(dport=80)
-
-            # Send the packet
-            send(p)
-            return
-            # Your processing logic here
-
-
-
-
-
-def wireshark(net):
-    file = open('capture.pcap', 'w')
-    file.close()
-    
-    thread=threading.Thread(target=thread_function)
-    thread.start()
-    
-    # Only used to let the thread to take the mutex first
-    
-    while True:
-        mutex.acquire()
-        print("Process the data")
-        scapy_test(net)
-        print("Finished processing data")
-        mutex.release()
-        time.sleep(1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -163,35 +80,39 @@ import subprocess
 
 def host_read(host):
     while not host.shell or host.waiting:
-        sleep(1)
+        time.sleep(1)
     
     interface=str(host)+'-eth0'
-    print(interface)
+    
     index=0
     
-    while(1):
+    while True:
         file_name="capture_"+str(host)+"_"+str(index)+".pcap"
         
         send_cmd="timeout 20 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name
         host.cmd(send_cmd)
         
-        if index!=0:
-            file_name_to_remove="capture_"+str(host)+"_"+str(index-1)+".pcap"
-            subprocess.run(['rm', '-f', file_name_to_remove])
         index=index+1
         print("Called "+interface)
 
-
-
-
-
-
 def network_read_write(net):
     hosts=net.hosts
+
+    file_path="parti.txt"
+    print("Wait")
+    while (not os.path.exists(file_path)):
+        time.sleep(2)
+        
+    print("Finished waiting")
+        
     for host in hosts:
         thread=threading.Thread(target=host_read, args=(host,))
         thread.start()
         print(host)
+        
+        
+        
+        
 
 if __name__ == "__main__":
     topo = NetworkTopo()
