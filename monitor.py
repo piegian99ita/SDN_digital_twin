@@ -80,7 +80,7 @@ def create_network(hosts,switches,links):
         link=TCLink,
         #controller=None,
     )
-    controller = RemoteController("c1", ip="127.0.0.1", port=6633)
+    controller = RemoteController("c1", ip="127.0.0.1", port=5544)
     net2.addController(controller)
     net2.build()
     net2.start()
@@ -178,4 +178,4 @@ if __name__ == "__main__":
         
         create_network(new_hosts,new_switches,new_links)
                
-        time.sleep(10) 
+        time.sleep(1) 
