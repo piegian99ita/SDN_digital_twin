@@ -76,4 +76,14 @@ if __name__ == "__main__":
     net.build()
     net.start()
     CLI(net)
+    # Create a thread to remove host h3 after 5 seconds
+    removal_thread = threading.Thread(target=delayed_removal, args=(net, 5, 'h3'))
+    removal_thread.start()
+
+    # Start the CLI
+    CLI(net)
+
+    # Wait for the removal thread to finish
+    removal_thread.join()
+
     net.stop()
