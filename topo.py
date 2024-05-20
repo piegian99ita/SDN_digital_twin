@@ -9,6 +9,7 @@ from mininet.util import dumpNodeConnections
 import os
 import time
 import threading
+import multiprocessing
 
 
 class NetworkTopo(Topo):
@@ -84,25 +85,31 @@ def host_read(host):
     
     interface=str(host)+'-eth0'
     
+    print("Called interface : "+interface)
     index=0
     
     while True:
         file_name="./capture/capture_"+str(host)+"_"+str(index)+".pcap"
         
-        send_cmd="timeout 10 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name
+        send_cmd="timeout 10 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name+" &"
+        #Come mettere in background il processo
         host.cmd(send_cmd)
         
+        time.sleep(10)
+        
         index=index+1
-        print("Called "+interface)
 
 def network_read_write(net):
     hosts=net.hosts
     file_path="start.txt"
     subprocess.run(['rm', '-f', file_path])
+    subprocess.run('rm -f ./capture/*', shell=True)
+    #subprocess.run(['rm','-f',"./capture/*"])
 
 
     
     print("Wait")
+    
     while (not os.path.exists(file_path)):
         time.sleep(2)
         
@@ -111,6 +118,7 @@ def network_read_write(net):
     i=0   
     for host in hosts:
         thread_list.append(threading.Thread(target=host_read, args=(host,)))
+        #thread_list[i].daemon = True
         thread_list[i].start()
         i+=1
         print(host)
@@ -145,10 +153,16 @@ if __name__ == "__main__":
     # Wait for network to stabilize
     net.waitConnected()
     
-    thread=threading.Thread(target=network_read_write, args=(net,))
-    thread.start()
-
+    
+    #thread=threading.Thread(target=network_read_write, args=(net,))
+    #thread.start()
+    process = multiprocessing.Process(target=network_read_write, args=(net,))
+    process.daemon = True
+    process.start()
+    
     CLI(net)
-    thread.join()
     net.stop()
+
+
+    #thread.join()
     

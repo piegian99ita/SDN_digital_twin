@@ -1,52 +1,19 @@
-import requests
-import time
+#!/usr/bin/python3
+
 from mininet.topo import Topo
 from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
-from mininet.link import TCLink
 from mininet.cli import CLI
+from mininet.link import TCLink
+from mininet.util import dumpNodeConnections
 import os
 import time
 import threading
-import subprocess
-
-#questo script serve per definire la topologia della rete ricevendo dal controller queste informazioni 
-
-
-# Definizione degli endpoint dell'API REST
-BASE_URL = 'http://127.0.0.1:8080/v1.0/topology'
-SWITCHES_ENDPOINT = '/switches'
-LINKS_ENDPOINT = '/links'
-HOSTS_ENDPOINT = '/hosts'
-
-# Funzione per ottenere informazioni su tutti gli switch nella topologia
-def get_switches():
-    response = requests.get(BASE_URL + SWITCHES_ENDPOINT)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
-
-# Funzione per ottenere informazioni su tutti i collegamenti nella topologia
-def get_links():
-    response = requests.get(BASE_URL + LINKS_ENDPOINT)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
-
-# Funzione per ottenere informazioni su tutti gli host nella topologia
-def get_hosts():
-    response = requests.get(BASE_URL + HOSTS_ENDPOINT)
-    if response.status_code == 200:
-        return response.json()
-    else:   
-        return None
-
+import multiprocessing
 
 
 class NetworkTopo(Topo):
-    def __init__(self,hosts,switches,links):
+    def __init__(self):
         # Initialize topology
         Topo.__init__(self)
 
@@ -54,189 +21,148 @@ class NetworkTopo(Topo):
         host_config = dict(inNamespace=True)
         
         link_config = dict(bw=1)
-        for switch in switches:
-            sconfig = {"dpid": "%016x" % (int(switch['dpid'], 16)+10) }
-            self.addSwitch(switch['name']+"_twin", **sconfig)
+        
 
+        for i in range(1):
+            sconfig = {"dpid": "%016x" % (i + 1)}
+            self.addSwitch("s%d" % (i + 1), **sconfig)
+
+        #self.addLink("s1","s2",**link_config)
+        #self.addLink("s2","s3",**link_config)
         # Create host nodes
-        for i in hosts:
-            self.addHost(i+"_twin" , **host_config)
+        for i in range(2):
+            self.addHost("h%d" % (i + 1), **host_config)
+        
 
-        
-        # Add switch links
-        for link in links:
-            self.addLink(link['first']+"_twin",link['second']+"_twin",**link_config)
-        
+        # Add host links    
     
+        self.addLink("h1","s1")
+        self.addLink("h2","s1")
+        #self.addLink("h3","s2")    
+        #self.addLink("h4","s3")
+        # Add switch links
+        
+           
+        
+        
+        #self.addLink("h4", "s4", **link_config)
 
-topos = {"digital_twin_topo": (lambda: NetworkTopo())}
+        # # Create switch nodes
+        # for i in range(4):
+        #     sconfig = {"dpid": "%016x" % (i + 1)}
+        #     self.addSwitch("s%d" % (i + 1), **sconfig)
+
+        # # Create host nodes
+        # for i in range(6):
+        #     self.addHost("h%d" % (i + 1), **host_config)
+
+        
+        
+
+        # # Add host links
+        # self.addLink("h1", "s1", **host_link_config)
+        # self.addLink("h2", "s1", **host_link_config)
+        # self.addLink("h3", "s4", **host_link_config)
+        # self.addLink("h4", "s4", **host_link_config)
+        # self.addLink("h5", "s2", **host_link_config)
+        # self.addLink("h6", "s3", **host_link_config)
+
+
+topos = {"networkslicingtopo": (lambda: NetworkTopo())}
 
 
 
 
 
-def host_write(host):
+
+
+
+import subprocess
+
+def host_read(host):
     while not host.shell or host.waiting:
         time.sleep(1)
     
+    interface=str(host)+'-eth0'
     
+    print("Called interface : "+interface)
     index=0
-    name=str(host).replace("_twin","")
-    print(name)
+    
     while True:
-        file_name="./capture/capture_"+name+"_"+str(index)+".pcap"
+        file_name="./capture/capture_"+str(host)+"_"+str(index)+".pcap"
         
-        print("Entered before")
-
-
+        send_cmd="timeout 10 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name+" &"
+        #Come mettere in background il processo
+        host.cmd(send_cmd)
         
-        while (not os.path.exists(file_name)):
-            time.sleep(2)
-            
-        print("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
-        host.cmd("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
-        
-        subprocess.run(['rm', '-f', file_name])
+        time.sleep(10)
         
         index=index+1
-        
 
-
-
-
-def network_write(net):
-      
-    file_path="start.txt"
-    with open(file_path, 'w'):
-        pass
-    
-    
+def network_read_write(net):
     hosts=net.hosts
+    file_path="start.txt"
+    subprocess.run(['rm', '-f', file_path])
+    subprocess.run('rm -f ./capture/*', shell=True)
+    #subprocess.run(['rm','-f',"./capture/*"])
+
+
+    
+    print("Wait")
+    
+    while (not os.path.exists(file_path)):
+        time.sleep(2)
+        
+    print("Finished waiting")
     thread_list=[] 
     i=0   
     for host in hosts:
-        thread_list.append(threading.Thread(target=host_write, args=(host,)))
+        thread_list.append(threading.Thread(target=host_read, args=(host,)))
+        #thread_list[i].daemon = True
         thread_list[i].start()
         i+=1
         print(host)
     
     for threads in thread_list:
         threads.join() 
-    
+        
+        
+        
 
-
-
-
-def create_network(hosts,switches,links):
-    print("\nCreate new network")
-    digital_topo = NetworkTopo(hosts,switches,links)
-    net2 = Mininet(
-        topo=digital_topo,
+if __name__ == "__main__":
+    topo = NetworkTopo()
+    net = Mininet(
+        topo=topo,
         switch=OVSKernelSwitch,
         build=False,
         autoSetMacs=True,
         autoStaticArp=True,
         link=TCLink,
-        #controller=None,
     )
-    controller = RemoteController("c1", ip="127.0.0.1", port=5544)
-    net2.addController(controller)
-    net2.build()
-    net2.start()
-    thread=threading.Thread(target=network_write, args=(net2,))
-    thread.start()
-    CLI(net2)
-    net2.stop()
+    controller = RemoteController("c1", ip="127.0.0.1", port=6633)
+    net.addController(controller)
+    net.build()
+    net.start()
+    # Connect to the custom controller
+    net.controllers[0].start()
+    
+    # Set MAC address of the controller
+    custom_controller = net.controllers[0]
+    custom_controller.mac_address = "11:00:00:00:00:01"
+
+    # Wait for network to stabilize
+    net.waitConnected()
+    
+    
+    #thread=threading.Thread(target=network_read_write, args=(net,))
+    #thread.start()
+    process = multiprocessing.Process(target=network_read_write, args=(net,))
+    process.daemon = True
+    process.start()
+    
+    CLI(net)
+    net.stop()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Esempio di utilizzo delle funzioni per ottenere le informazioni sulla topologia
-if __name__ == "__main__":
-    while True:
-        print("\n\nSTART MONITORING!")
-        new_links=[]
-        new_hosts=[]
-        new_switches=[]
-        
-        
-        #We add the switches to our new network
-        switches = get_switches()
-        
-        if switches:
-            for switch in switches:
-                dicto={"name":"s%d" % int(switch['dpid']), "dpid":"%016x" % int(switch['dpid'])}
-                new_switches.append(dicto)
-                            
-        
-        
-        #We get the links from the hosts
-        hosts=get_hosts()
-        
-        if hosts:
-            for host in hosts:
-                mac_parts=host['mac'].split(":")
-                first=0
-                for part in mac_parts:
-                    first = (first << 8) + int(part, 16)
-                
-                new_hosts.append("h%d" % first)
-                
-                dicto={"first":"h%d" % first, "second":"s%d" % int(host['port']['dpid'])}
-                new_links.append(dicto)
-                #print(str(index)+". [Mac:"+host['mac']+"  port:{"+"dpid:'"+host['port']['dpid']+"' name:"+host['port']['name']+"]")
-        
-        
-        
-        #We get the links from the switches
-        links=get_links()
-        
-        if links:
-            for link in links:
-                 dicto={"first":"s%d" % int(link['src']['dpid']), "second":"s%d" % int(link['dst']['dpid'])}
-                 new_links.append(dicto)
-        
-             
-        
-        #We check for duplicates: 
-        # Such as: [{first:"s1", second:"s2"},{first:"s2",second:"s1"}] 
-        for link in new_links:
-            first=link['first']
-            second=link['second']
-            for index,secLink in enumerate(new_links):
-                if secLink['first']==second and secLink['second']==first:
-                    del new_links[index]
-        
-        
-        #Print all devices and links we see from our network
-        if new_hosts:
-            print("\nHosts:")
-            for host in new_hosts:
-                print(host)
-        
-        if new_switches:
-            print("\nSwitches:")
-            for switch in new_switches:
-                print(switch)
-        
-        if new_links:
-            print("\nLinks:")
-            for links in new_links:
-                print(links)  
-        
-        create_network(new_hosts,new_switches,new_links)
-               
-        time.sleep(1) 
+    #thread.join()
+    
