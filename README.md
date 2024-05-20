@@ -25,7 +25,8 @@
 
  ### START THE MONITOR
  Start the second network.
- (There is a problem if we try to disconnect a link between devices, since the commands don't work and the API doesn't properly work) (working in progress)
+ (There is a problem if we try to disconnect a link between devices, since the commands don't work and the API doesn't properly work) (working in progress) 
+ 
  In order to start the monitor we can type in the fourth window: 
 
  ```bash
