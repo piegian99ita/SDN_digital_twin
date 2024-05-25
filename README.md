@@ -1,3 +1,9 @@
+#### DIGITAL TWINS IN SDN NETWORKS
+ This project explores the application of machine learning for traffic prediction in Software-Defined Networking (SDN) environments. It leverages the following technologies:
+
+ Mininet: A Python library for emulating network topologies, enabling the creation and experimentation with virtual networks.
+ Ryu: A popular open-source SDN controller framework, providing the foundation for constructing your custom traffic management and data collection logic.
+
 ### START THE NETWORK
  To start our system you need to open 4 terminal windows:
  In the first terminal window start the topology "topo.py"(everytime we start the network we need to clean the previous mininet instance):
