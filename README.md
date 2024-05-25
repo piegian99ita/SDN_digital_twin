@@ -17,6 +17,7 @@
  cd comnetsemu/SDN_digital_twin
  sudo mn -c 
  sudo python3 topo.py
+ ```
 
  This will create our main network, where we will get the data and share them with the second network (his digital twin)
  ### START THE PHYSICAL CONTROLLER
