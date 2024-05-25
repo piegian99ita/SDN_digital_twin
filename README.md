@@ -1,4 +1,4 @@
-#### DIGITAL TWINS IN SDN NETWORKS
+## DIGITAL TWINS IN SDN NETWORKS
  This project explores the application of machine learning for traffic prediction in Software-Defined Networking (SDN) environments. It leverages the following technologies:
 
  Mininet: A Python library for emulating network topologies, enabling the creation and experimentation with virtual networks.
