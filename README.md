@@ -7,7 +7,7 @@
 
  ## Getting Started
 
- To start our system, you need to open 4 terminal windows:
+ To start our system, you need to open 4 terminal windows. We recommend using `tmux` to parallelize the environment effectively.
 
  ### Terminal 1: Start the Topology
 
