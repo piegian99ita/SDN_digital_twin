@@ -5,6 +5,7 @@ from mininet.net import Mininet
 from mininet.node import OVSKernelSwitch, RemoteController
 from mininet.cli import CLI
 from mininet.link import TCLink
+from mininet.log import setLogLevel, info
 from mininet.util import dumpNodeConnections
 import os
 import time
@@ -12,7 +13,58 @@ import threading
 import multiprocessing
 
 
+class MyCLI(CLI):
+    def __init__(self, mininet):
+        print("Called\n")
+        CLI.__init__(self, mininet)
+        self.mn = mininet
+        
+    
+    def do_link(self,line):
+        args = line.split()
+        if len(args) != 3:
+            return
+        src, dst, status = args
+        comando = f"ifconfig h3-eht0"
+
+        links=self.mn.links
+        for link in links:
+            print(dir(link.intf1))
+            link1=str(link.intf1)
+            link2=str(link.intf2)
+            
+            if (link1.split("-")[0]==src and link2.split("-")[0]==dst) or (link2.split("-")[0]==src and link1.split("-")[0]==dst):
+                host_int=src+"_twin"+link1.split("-")[1]
+                print(host_int)
+                comando = f"ifconfig {host_int}"
+                output = subprocess.run(comando, shell=True, capture_output=True, text=True)
+                down_command=f"sudo ifconfig h2-eth0 down"
+                subprocess.run(down_command)
+                if output.returncode == 0:
+                    down_command=f"sudo ifconfig h2-eth0 down"
+                    subprocess.run(down_command)
+                else:
+                    print(f"L'interfaccia non esiste.")
+                
+                second_host=dst+"_twin"+link2.split("-")[1]
+                comando = f"ifconfig {second_host}"
+                output = subprocess.run(comando, shell=True, capture_output=True, text=True)
+                if output.returncode == 0:
+                    down_command=f"sudo ifconfig {second_host} down"
+                    subprocess.run(down_command)
+                else:
+                    print(f"L'interfaccia non esiste.")
+                
+            
+        
+        self.mn.configLinkStatus(src, dst, status)
+        
+        
+
+
 class NetworkTopo(Topo):
+    
+    
     def __init__(self):
         # Initialize topology
         Topo.__init__(self)
@@ -109,13 +161,14 @@ def network_read_write(net):
 
     
     print("Wait")
+    file_path="start.txt"
     
-    while (not os.path.exists(file_path)):
+    while not os.path.isfile(file_path):
         time.sleep(2)
         
     print("Finished waiting")
     thread_list=[] 
-    i=0   
+    i=0
     for host in hosts:
         thread_list.append(threading.Thread(target=host_read, args=(host,)))
         #thread_list[i].daemon = True
@@ -160,7 +213,8 @@ if __name__ == "__main__":
     process.daemon = True
     process.start()
     
-    CLI(net)
+    MyCLI(net).cmdloop()
+    #CLI(net)
     net.stop()
 
 
