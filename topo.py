@@ -13,55 +13,6 @@ import threading
 import multiprocessing
 
 
-class MyCLI(CLI):
-    def __init__(self, mininet):
-        print("Called\n")
-        CLI.__init__(self, mininet)
-        self.mn = mininet
-        
-    
-    def do_link(self,line):
-        args = line.split()
-        if len(args) != 3:
-            return
-        src, dst, status = args
-        comando = f"ifconfig h3-eht0"
-
-        links=self.mn.links
-        for link in links:
-            print(dir(link.intf1))
-            link1=str(link.intf1)
-            link2=str(link.intf2)
-            
-            if (link1.split("-")[0]==src and link2.split("-")[0]==dst) or (link2.split("-")[0]==src and link1.split("-")[0]==dst):
-                host_int=src+"_twin"+link1.split("-")[1]
-                print(host_int)
-                comando = f"ifconfig {host_int}"
-                output = subprocess.run(comando, shell=True, capture_output=True, text=True)
-                down_command=f"sudo ifconfig h2-eth0 down"
-                subprocess.run(down_command)
-                if output.returncode == 0:
-                    down_command=f"sudo ifconfig h2-eth0 down"
-                    subprocess.run(down_command)
-                else:
-                    print(f"L'interfaccia non esiste.")
-                
-                second_host=dst+"_twin"+link2.split("-")[1]
-                comando = f"ifconfig {second_host}"
-                output = subprocess.run(comando, shell=True, capture_output=True, text=True)
-                if output.returncode == 0:
-                    down_command=f"sudo ifconfig {second_host} down"
-                    subprocess.run(down_command)
-                else:
-                    print(f"L'interfaccia non esiste.")
-                
-            
-        
-        self.mn.configLinkStatus(src, dst, status)
-        
-        
-
-
 class NetworkTopo(Topo):
     
     
@@ -75,7 +26,7 @@ class NetworkTopo(Topo):
         link_config = dict(bw=1)
         
 
-        for i in range(1):
+        for i in range(2):
             sconfig = {"dpid": "%016x" % (i + 1)}
             self.addSwitch("s%d" % (i + 1), **sconfig)
 
@@ -89,7 +40,8 @@ class NetworkTopo(Topo):
         # Add host links    
     
         self.addLink("h1","s1")
-        self.addLink("h2","s1")
+        self.addLink("h2","s2")
+        self.addLink("s1","s2")
         #self.addLink("h3","s2")    
         #self.addLink("h4","s3")
         # Add switch links
@@ -213,8 +165,7 @@ if __name__ == "__main__":
     process.daemon = True
     process.start()
     
-    MyCLI(net).cmdloop()
-    #CLI(net)
+    CLI(net)
     net.stop()
 
 
