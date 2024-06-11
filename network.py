@@ -95,11 +95,11 @@ def host_read(host):
     while True:
         file_name="./capture/capture_"+str(host)+"_"+str(index)+".pcap"
         
-        send_cmd="timeout 10 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name+" &"
+        send_cmd="timeout 3 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name+" &"
         #Come mettere in background il processo
         host.cmd(send_cmd)
         
-        time.sleep(10)
+        time.sleep(3)
         
         index=index+1
 
@@ -112,7 +112,7 @@ def network_read_write(net):
 
 
     
-    print("Wait")
+    #print("Wait")
     file_path="start.txt"
     
     while not os.path.isfile(file_path):

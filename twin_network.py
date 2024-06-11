@@ -9,6 +9,7 @@ import os
 import time
 import threading
 import subprocess
+from scapy.all import *
 
 #questo script serve per definire la topologia della rete ricevendo dal controller queste informazioni 
 
@@ -82,18 +83,31 @@ def host_write(host):
     
     index=0
     name=str(host).replace("_twin","")
-    print(name)
+    #print(name)
     while True:
         file_name="./capture/capture_"+name+"_"+str(index)+".pcap"
-        
-        print("Entered before")
-        
-        while (not os.path.exists(file_name)):
-            time.sleep(2)
+        file_name2="./capture/capture_"+name+"_"+str(index+1)+".pcap"
             
-        time.sleep(4)
-        print("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
+        #print("Entered before")
+        
+        while (not os.path.exists(file_name2)):
+            time.sleep(1)
+
+        # packets = rdpcap(file_name)
+        # ind=0
+        # for packet in packets:
+
+        #     if packet.haslayer(IP) or packet.haslayer(Ethernet) and ind==0:
+        #         new_packet=packet
+        #         ind+=1
+        #         wrpcap(file_name,new_packet)
+        
+
+        #time.sleep(4)
+        #print("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
+        #host.cmd("tcprewrite --infile="+ file_name +" --outfile=" + file_name+ " --fixcsum" )
         host.cmd("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
+        #print("--- PACKETS SENT ---")
         
         subprocess.run(['rm', '-f', file_name])
         
@@ -117,7 +131,7 @@ def network_write(net):
         thread_list.append(threading.Thread(target=host_write, args=(host,)))
         thread_list[i].start()
         i+=1
-        print(host)
+        #print(host)
     
     for threads in thread_list:
         threads.join() 
@@ -239,3 +253,4 @@ if __name__ == "__main__":
         create_network(new_hosts,new_switches,new_links)
                
         time.sleep(1) 
+
