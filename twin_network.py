@@ -140,6 +140,43 @@ def network_write(net):
 
 
 
+def check_links(net):
+    
+
+    links_by_definition=net.links
+    
+    while True:
+        
+        links=get_links()
+        for link in links_by_definition:
+            
+            node1 = link.intf1.node.name
+            node2 = link.intf2.node.name
+            
+            if not (link.intf1.node.name.startswith('s') and link.intf2.node.name.startswith('s')):
+                continue
+            
+            
+            flag_exists=False
+        
+            for current_link in links:
+                
+                if node1.split('_')[0]==current_link["src"]["name"].split('-')[0] and node2.split('_')[0]==current_link["dst"]["name"].split('-')[0]:
+                    flag_exists=True
+                    link.intf1.ifconfig('up')
+                    link.intf2.ifconfig('up')
+                    
+            
+            if not flag_exists:
+                link.intf1.ifconfig('down')
+                link.intf2.ifconfig('down')
+
+        
+        time.sleep(10)
+
+
+
+
 def create_network(hosts,switches,links):
     print("\nCreate new network")
     digital_topo = NetworkTopo(hosts,switches,links)
@@ -158,14 +195,11 @@ def create_network(hosts,switches,links):
     net2.start()
     thread=threading.Thread(target=network_write, args=(net2,))
     thread.start()
+
+    check_link=threading.Thread(target=check_links, args=(net2,))
+    check_link.start()
     CLI(net2)
     net2.stop()
-
-
-
-
-
-
 
 
 
