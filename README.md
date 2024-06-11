@@ -31,7 +31,7 @@
  ```bash
  git clone https://github.com/yourusername/comnetsemu/SDN_digital_twin.git
  cd comnetsemu/SDN_digital_twin
- ```bash
+ ```
 
 
  To start our system, you need to open 4 terminal windows. We recommend using `tmux` to parallelize the environment effectively.
