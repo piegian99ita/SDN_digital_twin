@@ -1,6 +1,6 @@
  # Digital Twins in SDN Networks
  
- This project explores the application of machine learning for traffic prediction in Software-Defined Networking (SDN) environments. It leverages the following technologies:
+ This project explores the creation of a real-time digital twin for network management in Software-Defined Networking (SDN) environments. It leverages the following technologies:
 
  - **Mininet**: A Python library for emulating network topologies, enabling the creation and experimentation with virtual networks.
  - **Ryu**: A popular open-source SDN controller framework, providing the foundation for constructing custom traffic management and data collection logic.
@@ -20,7 +20,7 @@
  ```
 
  This will create our main network, where we will get the data and share them with the second network (his digital twin)
- ### START THE PHYSICAL CONTROLLER
+ ### Terminal 2: start the physical controller
 
  In order to start the RYU controller type in the second window:
 
@@ -29,14 +29,14 @@
  ```
 
  This will enable the devices in the first network to communicate, it will also enable other functionality for the network.
- ### START THE DIGITAL TWIN CONTROLLER
+ ### Terminal 3: start the digital twin's controller
  Start the ryu manager for the second network, the digital twin.
  In the third window type:
  ```bash
    ryu-manager --ofp-tcp-listen-port 5544 ryu.app.simple_switch_13
  ```
 
- ### START THE MONITOR
+ ### Terminal 4: start the monitor(digital twin)
  Start the second network.
  (There is a problem if we try to disconnect a link between devices, since the commands don't work and the API doesn't properly work) (working in progress) 
  
