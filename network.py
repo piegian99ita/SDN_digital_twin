@@ -36,14 +36,14 @@ class NetworkTopo(Topo):
 
         
         # Add switch links
-        self.addLink("s1", "s2", **link_config)
+        self.addLink("s1", "s4", **link_config)
         self.addLink("s2", "s4", **link_config)
-        self.addLink("s2", "s3", **link_config)
+        self.addLink("s3", "s4", **link_config)
         
         # Add host links
         self.addLink("h1", "s1", **link_config)
-        self.addLink("h2", "s3", **link_config)
-        self.addLink("h3", "s4", **link_config)
+        self.addLink("h2", "s2", **link_config)
+        self.addLink("h3", "s3", **link_config)
 
 
 topos = {"networkslicingtopo": (lambda: NetworkTopo())}
