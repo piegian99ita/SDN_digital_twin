@@ -85,8 +85,8 @@ class TopologyAPI(app_manager.RyuApp):
 
         dpid = datapath.id
         self.mac_to_port.setdefault(dpid, {})
-
-        self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
+        if eth.ethertype != 34525:
+            self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
 
         # learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port

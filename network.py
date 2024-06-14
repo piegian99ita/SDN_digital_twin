@@ -23,53 +23,27 @@ class NetworkTopo(Topo):
         # Create template host, switch, and link
         host_config = dict(inNamespace=True)
         
-        link_config = dict(bw=1)
+        link_config = dict(bw=10)
         
 
-        for i in range(2):
+        for i in range(4):
             sconfig = {"dpid": "%016x" % (i + 1)}
             self.addSwitch("s%d" % (i + 1), **sconfig)
 
-        #self.addLink("s1","s2",**link_config)
-        #self.addLink("s2","s3",**link_config)
         # Create host nodes
-        for i in range(2):
+        for i in range(3):
             self.addHost("h%d" % (i + 1), **host_config)
-        
 
-        # Add host links    
-    
-        self.addLink("h1","s1")
-        self.addLink("h2","s2")
-        self.addLink("s1","s2")
-        #self.addLink("h3","s2")    
-        #self.addLink("h4","s3")
+        
         # Add switch links
+        self.addLink("s1", "s2", **link_config)
+        self.addLink("s2", "s4", **link_config)
+        self.addLink("s2", "s3", **link_config)
         
-           
-        
-        
-        #self.addLink("h4", "s4", **link_config)
-
-        # # Create switch nodes
-        # for i in range(4):
-        #     sconfig = {"dpid": "%016x" % (i + 1)}
-        #     self.addSwitch("s%d" % (i + 1), **sconfig)
-
-        # # Create host nodes
-        # for i in range(6):
-        #     self.addHost("h%d" % (i + 1), **host_config)
-
-        
-        
-
-        # # Add host links
-        # self.addLink("h1", "s1", **host_link_config)
-        # self.addLink("h2", "s1", **host_link_config)
-        # self.addLink("h3", "s4", **host_link_config)
-        # self.addLink("h4", "s4", **host_link_config)
-        # self.addLink("h5", "s2", **host_link_config)
-        # self.addLink("h6", "s3", **host_link_config)
+        # Add host links
+        self.addLink("h1", "s1", **link_config)
+        self.addLink("h2", "s3", **link_config)
+        self.addLink("h3", "s4", **link_config)
 
 
 topos = {"networkslicingtopo": (lambda: NetworkTopo())}
@@ -95,11 +69,11 @@ def host_read(host):
     while True:
         file_name="./capture/capture_"+str(host)+"_"+str(index)+".pcap"
         
-        send_cmd="timeout 3 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name+" &"
+        send_cmd="timeout 5 tcpdump -i "+interface+" not ether proto 0x88cc and not icmp6 -w "+file_name+" &"
         #Come mettere in background il processo
         host.cmd(send_cmd)
         
-        time.sleep(3)
+        time.sleep(5)
         
         index=index+1
 
