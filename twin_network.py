@@ -110,7 +110,7 @@ def host_write(host,index):
     #time.sleep(4)
     #print("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name)
     #host.cmd("tcprewrite --infile="+ file_name +" --outfile=" + file_name+ " --fixcsum" )
-    host.cmd("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name +" &")
+    host.cmd("tcpreplay --intf1="+ str(host.intfNames()[0]) +" " + file_name )
     #print("--- PACKETS SENT ---")
     
     subprocess.run(['rm', '-f', file_name])
