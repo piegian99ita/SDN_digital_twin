@@ -75,3 +75,8 @@
  ```
 
  (This will retrieve the information about the topology and opens up the CLI of Mininet inside the fourth terminal window, if we want to update the network type quit in mininet terminal: in the digital twin one )
+
+
+ ### Video Demo
+ [Watch the video](https://youtu.be/8qD7JdcJ6Dc)
+
