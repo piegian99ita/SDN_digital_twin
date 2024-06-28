@@ -60,7 +60,7 @@
  Start the ryu manager for the second network, the digital twin.
  In the third window type:
  ```bash
-   ryu-manager --ofp-tcp-listen-port 5544 ryu.app.simple_switch_13
+   ryu-manager --ofp-tcp-listen-port 5544 twin_controller.py
  ```
 
  ### Terminal 4: start the monitor(digital twin)
@@ -71,7 +71,7 @@
 
  ```bash
    cd comnetsemu/SDN_digital_twin
-   sudo python3 twin_monitor.py
+   sudo python3 twin_network.py
  ```
 
  (This will retrieve the information about the topology and opens up the CLI of Mininet inside the fourth terminal window, if we want to update the network type quit in mininet terminal: in the digital twin one )
