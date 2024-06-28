@@ -76,7 +76,7 @@
 
  (This will retrieve the information about the topology and opens up the CLI of Mininet inside the fourth terminal window, if we want to update the network type quit in mininet terminal: in the digital twin one )
 
- ###TEST
+ ### TEST
 
  To run the test we can ping the hosts in the original network and the packets should be printed in the twin_controller. If we need to turn down a link we can type in the CLI of the original network:
   ```bash
