@@ -76,6 +76,21 @@
 
  (This will retrieve the information about the topology and opens up the CLI of Mininet inside the fourth terminal window, if we want to update the network type quit in mininet terminal: in the digital twin one )
 
+ ###TEST
+
+ To run the test we can ping the hosts in the original network and the packets should be printed in the twin_controller. If we need to turn down a link we can type in the CLI of the original network:
+  ```bash
+   link s1 s4 down
+ ```
+Then wait for a few seconds in order to let the digital twin to update the topology and then we can check if the links are up by typing in the CLI of the original network::
+ ```bash
+   h1 ping -c1 h2
+ ```
+The packets should not be printed in the twin controller if the link is down.
+We can also bring up the link again with the command:
+  ```bash
+   link s1 s4 up
+ ```
 
  ### Video Demo
  [Watch the video](https://youtu.be/8qD7JdcJ6Dc)
