@@ -43,7 +43,7 @@
  ```bash
  cd comnetsemu/SDN_digital_twin
  sudo mn -c 
- sudo python3 topo.py
+ sudo python3 network.py
  ```
 
  This will create our main network, where we will get the data and share them with the second network (his digital twin)
@@ -71,7 +71,7 @@
 
  ```bash
    cd comnetsemu/SDN_digital_twin
-   sudo python3 monitor2.py
+   sudo python3 twin_monitor.py
  ```
 
  (This will retrieve the information about the topology and opens up the CLI of Mininet inside the fourth terminal window, if we want to update the network type quit in mininet terminal: in the digital twin one )
